@@ -1,0 +1,33 @@
+version: '3'
+
+services: 
+    zookeeper:
+        image: wurstmeister/zookeeper
+        container_name: zookeeper
+        ports: 
+            - "28080:2181"
+        networks: 
+            dockernet:
+                ipv4_address: 10.10.20.141
+    kafka:
+        image: wurstmeister/kafka
+        container_name: kafka
+        depends_on:
+            - zookeeper
+        ports: 
+            - "9092"
+        environment: 
+            KAFKA_ADVERTISED_HOST_NAME: 10.10.20.142
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+        networks: 
+            dockernet:
+                ipv4_address: 10.10.20.142
+
+networks: 
+    dockernet:
+        name: kafka-test-net
+        driver: bridge
+        ipam:
+            config:
+            - subnet: 10.10.20.0/24
+              gateway: 10.10.20.1
